@@ -9,6 +9,3 @@ python baseline/train.py run --dataset-dir ./datas/datasets
 ```
 
 ## Evaluate
-```bash
-curl -d "@pred.txt" -X POST 172.21.65.41:5000
-```
