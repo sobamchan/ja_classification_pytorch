@@ -4,6 +4,9 @@ import torch.nn.functional as F
 
 
 class Classifier(nn.Module):
+    '''
+    RNN (GRU) -> Linear(s)
+    '''
 
     def __init__(self, voc_n, pad_idx, hid_n, emb_size, dropout=0.5, class_n=6):
         super().__init__()
@@ -21,6 +24,9 @@ class Classifier(nn.Module):
         self.softmax = nn.LogSoftmax()
 
     def init_hidden(self, inp):
+        '''
+        Returns inp size hidden state for initial input for GRU.
+        '''
         return torch.zeros(1, inp.size(0), self.hid_n)
 
     def forward(self, inp, hid):

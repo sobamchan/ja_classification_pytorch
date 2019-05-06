@@ -41,6 +41,9 @@ def get_collate_fn(pad_idx, fix_max_len=None):
 
 
 def get_dataloader(dataset, bsize, pad_idx, fix_max_len=None, shuffle=True):
+    '''
+    Build pytorch dataloder instance, given lf dataset.
+    '''
     if shuffle:
         dataloader = data.DataLoader(
                 dataset,

@@ -49,24 +49,38 @@ def get_postprocess(t2i, unk_index):
 
 
 def build(dpath, savedir):
+    '''
+    1. Read dpath csv file.
+    2. Preprocess. (tokenizing, stripping)
+    3. Build vocab.
+    4. Replace tokens with ids.
+    5. Save.
+    '''
+
+    # Load csv data.
     dpath = Path(dpath)
     savedir = Path(savedir)
 
+    # Preprocess
     tokenizer = Tokenizer()
     train = lf.CsvDataset(str(dpath / 'train.csv'), header=True).map(get_preprocess(tokenizer))
     test = lf.CsvDataset(str(dpath / 'test.csv'), header=True).map(get_preprocess(tokenizer))
 
+    # Collect all tokens.
     tokens = lf.flat_map(
             lambda x: x['tokens'],
             train,
             lazy=True
             )
 
+    # Build vocab.
     words, t2i = build_vocab(tokens)
 
+    # Save vocab.
     with open(savedir / 'vocab.pkl', 'wb') as f:
         pickle.dump((t2i, words), f)
 
+    # Save dataset.
     train.map(get_postprocess(t2i, t2i[UNK_TOKEN])).save(str(savedir / 'dataset.train.token.pkl'))
     test.map(get_postprocess(t2i, t2i[UNK_TOKEN])).save(str(savedir / 'dataset.test.token.pkl'))
 

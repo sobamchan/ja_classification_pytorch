@@ -15,26 +15,37 @@ from baseline.models import Classifier
 
 
 def run(dataset_dir, hid_n=128, emb_size=128, bsize=128, epoch=10, lr=0.01, use_cuda=False, seed=0):
+    # For reproduction purpose, fix the random seed.
     torch.cuda.manual_seed(seed)
     torch.manual_seed(seed)
     np.random.seed(seed)
 
+    # Load dataset & vocab
     dataset_dir = Path(dataset_dir)
 
     train_dataset = lf.Dataset.load(dataset_dir / 'dataset.train.token.pkl')
     t2i, words = pickle.load(open(dataset_dir / 'vocab.pkl', 'rb'))
 
+    # Select gpu or cpu
     device = torch.device('cuda' if use_cuda else 'cpu')
 
     voc_n = len(t2i)
     pad_idx = t2i[PAD_TOKEN]
 
+    # Limit the lengths of input sentences.
     fix_max_len = 50
 
+    # Get dataloader
     train_dataloader = get_dataloader(train_dataset, bsize, pad_idx, fix_max_len=fix_max_len)
+
+    # Initialize model
     model = Classifier(voc_n, pad_idx, hid_n, emb_size, dropout=0)
     model = model.to(device)
+
+    # Initialize optimizer
     optimizer = optim.Adam(model.parameters(), lr=lr)
+
+    # Loss function for classification task.
     loss_func = nn.CrossEntropyLoss()
 
     model.train()
@@ -47,7 +58,7 @@ def run(dataset_dir, hid_n=128, emb_size=128, bsize=128, epoch=10, lr=0.01, use_
             hid = model.init_hidden(inputs)
             hid = hid.to(device)
 
-            out = model(inputs, hid)
+            out = model(inputs, hid)  # [B, C]
             loss = loss_func(out, labels)
 
             optimizer.zero_grad()
