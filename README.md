@@ -1,6 +1,6 @@
 ## Prepare dataset
 ```bash
-python baseline/data.py --dpath ./datas --savedir ./datas/datasets
+python baseline/data.py build --dpath ./datas --savedir ./datas/datasets
 ```
 
 ## Train
